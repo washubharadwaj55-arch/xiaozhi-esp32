@@ -1,6 +1,7 @@
 #ifndef _LVGL_DISPLAY_H
 #define _LVGL_DISPLAY_H
 
+#include <vector>
 #include "display.h"
 
 #include <freertos/FreeRTOS.h>
@@ -53,12 +54,6 @@
 class LvglImage;
 class LvglThemeManager;
 
-// Base Theme stub if needed by casting
-class Theme {
-public:
-    virtual ~Theme() = default;
-};
-
 class DisplayLockGuard {
 public:
     DisplayLockGuard(Display* display) : display_(display) {
@@ -109,7 +104,7 @@ public:
 
     std::shared_ptr<LvglThemeManager> theme_manager() const { return theme_manager_; }
 
-    virtual bool Lock(int timeout_ms) override;
+    virtual bool Lock(int timeout_ms = 0) override;
     virtual void Unlock() override;
 
     void SetDirectionGetMethod(const char* method, std::function<void(const char*)> callback);
