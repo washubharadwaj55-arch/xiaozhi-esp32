@@ -3,7 +3,8 @@
 
 #include <string>
 #include <memory>
-#include <esp_image_format.h>
+#include <cstdint>
+#include <cstddef>
 
 class Theme;
 
@@ -22,9 +23,8 @@ public:
     virtual bool ClearChatMessages() = 0;
     virtual bool SetTheme(const char* theme) = 0;
     virtual bool SetTheme(std::shared_ptr<const Theme> theme) = 0;
-    virtual bool SetImage(const esp_image_t* image) = 0;
     virtual bool SetImage(const uint8_t* data, size_t size) = 0;
-    virtual bool SnapshotToJpeg(std::string path, quality_t q) = 0;
+    virtual bool SnapshotToJpeg(std::string path, int quality) = 0;
     virtual bool SupportsEmoji(int code) { return false; }
     virtual void UpdateStatusbar(bool update_all = false) = 0;
 
