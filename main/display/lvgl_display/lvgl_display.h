@@ -53,6 +53,12 @@
 class LvglImage;
 class LvglThemeManager;
 
+// Base Theme stub if needed by casting
+class Theme {
+public:
+    virtual ~Theme() = default;
+};
+
 class DisplayLockGuard {
 public:
     DisplayLockGuard(Display* display) : display_(display) {
@@ -87,6 +93,7 @@ public:
 
     virtual bool SetTheme(const char* theme) override;
     virtual bool SetTheme(std::shared_ptr<const Theme> theme) override;
+    virtual void SetTheme(Theme* theme) { (void)theme; }
     void SetTheme(const std::string& theme_name);
     void SetTheme(std::shared_ptr<Theme> theme);
     void SetTheme(LvglTheme* theme);
@@ -97,6 +104,7 @@ public:
     virtual bool SnapshotJpeg(std::string& jpeg_data, int quality = 80);
     virtual bool SnapshotPng(std::string& png_data, size_t size);
     virtual void SetPreviewImage(const uint8_t* data, size_t size);
+    virtual void SetPreviewImage(std::unique_ptr<LvglImage> image) { (void)image; }
     virtual bool SupportsDynamicGlyph() { return true; }
 
     std::shared_ptr<LvglThemeManager> theme_manager() const { return theme_manager_; }
@@ -117,6 +125,7 @@ protected:
 
     lv_display_t* display_ = nullptr;
     lv_obj_t* status_bar_ = nullptr;
+    lv_obj_t* status_label_ = nullptr;
     lv_obj_t* content_ = nullptr;
     lv_obj_t* container_ = nullptr;
     lv_obj_t* emotion_label_ = nullptr;
@@ -127,6 +136,13 @@ protected:
     lv_obj_t* battery_label_ = nullptr;
     lv_obj_t* battery_progress_ = nullptr;
     lv_obj_t* notification_label_ = nullptr;
+    lv_obj_t* low_battery_popup_ = nullptr;
+    lv_obj_t* low_battery_label_ = nullptr;
+    lv_obj_t* preview_image_ = nullptr;
+
+    int width_ = 240;
+    int height_ = 240;
+    bool setup_ui_called_ = false;
 
     esp_timer_handle_t notification_timer_ = nullptr;
     esp_pm_lock_handle_t pm_lock_ = nullptr;
@@ -137,6 +153,7 @@ protected:
 
     std::shared_ptr<LvglThemeManager> theme_manager_;
     std::string current_theme_name_;
+    LvglTheme* current_theme_ = nullptr;
 
     std::chrono::system_clock::time_point last_status_update_time_;
     esp_timer_handle_t status_bar_timer_ = nullptr;
