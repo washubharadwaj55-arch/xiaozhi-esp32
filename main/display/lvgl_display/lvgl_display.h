@@ -16,7 +16,6 @@
 #include <chrono>
 
 #include <lvgl.h>
-#include <font_awesome.h>
 
 #include "dynamic_glyph_cache.h"
 #include "lvgl_font.h"
@@ -30,22 +29,26 @@ public:
     LvglDisplay();
     virtual ~LvglDisplay();
 
-    virtual void ShowNotification(const std::string& notification, int duration_ms = 3000) override;
-    virtual void ShowNotification(const char* notification, int duration_ms = 3000);
-    virtual void SetStatus(const std::string& status) override;
-    virtual void SetStatus(const char* status);
-    virtual void SetEmotion(const std::string& emotion) override;
-    virtual void SetEmotion(const char* emotion);
-    virtual void SetChatMessage(const char* role, const char* content) override;
-    virtual void ClearChatMessage() override;
+    virtual bool ShowNotification(const char* notification, int duration_ms = 3000) override;
+    virtual bool ShowNotification(const std::string& notification, int duration_ms = 3000) override {
+        return ShowNotification(notification.c_str(), duration_ms);
+    }
+    virtual bool SetStatus(const char* status) override;
+    virtual bool SetEmotion(const char* emotion) override;
+    virtual bool SetIcon(const char* icon) override { (void)icon; return true; }
+    virtual bool SetChatMessage(const char* role, const char* content) override;
+    virtual bool ClearChatMessages() override;
+    virtual bool SetTheme(const char* theme) override;
+    virtual bool SetTheme(std::shared_ptr<const Theme> theme) override;
+    virtual bool SetImage(const uint8_t* data, size_t size) override;
+    virtual bool SnapshotToJpeg(std::string path, int quality) override;
+
     virtual bool SnapshotJpeg(std::string& jpeg_data, int quality = 80);
     virtual bool SnapshotPng(std::string& png_data, size_t size);
     virtual void SetPreviewImage(const uint8_t* data, size_t size);
     virtual bool SupportsDynamicGlyph() { return true; }
 
     std::shared_ptr<LvglThemeManager> theme_manager() const { return theme_manager_; }
-    void SetTheme(const std::string& theme_name);
-    void SetTheme(std::shared_ptr<Theme> theme);
 
     virtual bool Lock(int timeout_ms = 0) override;
     virtual void Unlock() override;
@@ -53,9 +56,9 @@ public:
     void SetDirectionGetMethod(const char* method, std::function<void(const char*)> callback);
     void SetEmotionSelectedMethod(std::function<void(const char*)> callback);
 
-protected:
-    virtual bool Lock() = 0;
+    virtual void UpdateStatusbar(bool update_all = false) override;
 
+protected:
     esp_lcd_panel_io_handle_t panel_io_ = nullptr;
     esp_lcd_panel_handle_t panel_ = nullptr;
 
@@ -83,8 +86,6 @@ protected:
     bool show_status_bar_ = false;
 
     std::unique_ptr<DynamicGlyphCache> glyph_cache_;
-
-    void UpdateStatusbar(bool force = false);
 
     friend class DisplayNetwork;
     virtual void SetupUI();
