@@ -7,10 +7,13 @@
 #include <cstddef>
 #include <vector>
 
-// Full Theme definition so derived classes can inherit without forward declaration issues
+class LvglFont;
+
+// Base Theme interface expected by LvglTheme and LcdDisplay
 class Theme {
 public:
     virtual ~Theme() = default;
+    virtual std::shared_ptr<LvglFont> GetTextFont() const { return nullptr; }
 };
 
 class Display {
@@ -33,7 +36,6 @@ public:
     virtual bool SupportsEmoji(int code) { return false; }
     virtual void UpdateStatusbar(bool update_all = false) = 0;
 
-    // Must be public so DisplayLockGuard can access them
     virtual bool Lock(int timeout_ms = 0) = 0;
     virtual void Unlock() = 0;
 };
