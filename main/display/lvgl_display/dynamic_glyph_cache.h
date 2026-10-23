@@ -1,44 +1,41 @@
-#ifndef DYNAMIC_GLYPH_CACHE_H
-#define DYNAMIC_GLYPH_CACHE_H
+#ifndef _DYNAMIC_GLYPH_CACHE_H_
+#define _DYNAMIC_GLYPH_CACHE_H_
 
-#include "display.h"
-
-#include <lvgl.h>
-#include <cstddef>
-#include <cstdint>
 #include <vector>
+#include <cstdint>
+#include <lvgl.h>
+
+struct TextGlyph {
+    uint32_t unicode;
+    uint16_t box_w;
+    uint16_t box_h;
+    int16_t ofs_x;
+    int16_t ofs_y;
+    uint16_t adv_w;
+    const uint8_t* bitmap;
+};
+
+template <typename T>
+using TextGlyphVector = std::vector<T>;
 
 class DynamicGlyphCache {
 public:
-    static constexpr size_t kMaxGlyphs = 256;
-    static constexpr size_t kMaxBitmapBytes = 64 * 1024;
-
-    DynamicGlyphCache();
-    lv_font_t* EnsureFont(const lv_font_t* base_font, uint8_t bpp);
-    bool AddGlyphs(const std::vector<TextGlyph>& glyphs);
-    void Clear();
-
-private:
     struct Entry {
-        uint32_t codepoint = 0;
-        uint32_t adv_w = 0;
-        uint16_t box_w = 0;
-        uint16_t box_h = 0;
-        int16_t ofs_x = 0;
-        int16_t ofs_y = 0;
-        TextGlyphVector<uint8_t> bitmap;
-        uint64_t last_use = 0;
+        uint32_t unicode;
+        lv_font_glyph_dsc_t dsc;
+        uint32_t offset;
     };
 
-    void Rebuild();
-    size_t BitmapBytes() const;
+    DynamicGlyphCache() = default;
+    ~DynamicGlyphCache() = default;
 
-    bool initialized_ = false;
-    bool retain_between_batches_ = false;
-    uint8_t bpp_ = 0;
-    uint64_t use_counter_ = 0;
-    lv_font_t font_{};
-    lv_font_fmt_txt_dsc_t dsc_{};
+    bool AddGlyph(const TextGlyph& glyph);
+    bool AddGlyphs(const std::vector<TextGlyph>& glyphs);
+
+    const lv_font_glyph_dsc_t* GetGlyphDsc(uint32_t unicode_letter);
+    const uint8_t* GetGlyphBitmap(uint32_t unicode_letter);
+
+private:
     TextGlyphVector<Entry> entries_;
     TextGlyphVector<uint8_t> bitmap_blob_;
     TextGlyphVector<uint16_t> unicode_list_;
@@ -46,4 +43,4 @@ private:
     TextGlyphVector<lv_font_fmt_txt_cmap_t> cmaps_;
 };
 
-#endif
+#endif // _DYNAMIC_GLYPH_CACHE_H_
