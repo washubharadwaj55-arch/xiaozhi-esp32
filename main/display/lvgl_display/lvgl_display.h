@@ -32,7 +32,7 @@ public:
     virtual bool SetPreviewImage(const esp_image_t* image) override;
     virtual bool SetPreviewImage(const uint8_t* data, size_t size) override;
     virtual bool SetStatusMode(bool mode) override;
-    virtual bool SnapshotToJpeg(std::string jpeg_data, int quality = 80) override;
+    virtual bool SnapshotToJpeg(std::string& jpeg_data, int quality = 80) override;
     virtual bool SetChatMessage(const char* role, const char* content) override;
     virtual bool ClearChatMessage() override;
     virtual bool SetEmotion(const char* emotion) override;
@@ -42,10 +42,10 @@ public:
 
     void SetThemeManager(std::shared_ptr<LvglThemeManager> theme_manager);
     void SetTheme(LvglTheme* theme);
-    void Tick();
+    void Tick(uint32_t period = 0);
 
-    void SetChatMessage(std::function<void(const char*, const char*)> callback);
-    void SetEmotionMessage(std::function<void(const char*)> callback);
+    void SetOnChatMessage(std::function<void(const char*, const char*)> callback);
+    void SetOnEmotionSet(std::function<void(const char*)> callback);
 
 protected:
     esp_pm_lock_handle_t pm_lock_ = nullptr;
@@ -64,6 +64,10 @@ protected:
     lv_timer_t* low_battery_timer_ = nullptr;
     bool muted_ = false;
 
+    std::shared_ptr<LvglThemeManager> theme_manager_;
+    std::shared_ptr<LvglTheme> light_theme_;
+    std::shared_ptr<LvglTheme> dark_theme_;
+
     std::chrono::system_clock::time_point last_status_update_time_;
     esp_timer_handle_t notification_timer_ = nullptr;
     int last_displayed_clock_min_ = -1;
@@ -75,3 +79,4 @@ protected:
 };
 
 #endif // LVGL_DISPLAY_H
+
