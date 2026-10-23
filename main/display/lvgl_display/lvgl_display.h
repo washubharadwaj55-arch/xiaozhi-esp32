@@ -1,3 +1,4 @@
+
 #ifndef _LVGL_DISPLAY_H
 #define _LVGL_DISPLAY_H
 
@@ -21,7 +22,19 @@
 #include "lvgl_font.h"
 #include "lvgl_theme.h"
 
-// Fallback battery symbols if not defined by icon font
+// All fallback battery and charging symbols
+#ifndef MATERIAL_SYMBOLS_BATTERY_CHARGING_FULL
+#define MATERIAL_SYMBOLS_BATTERY_CHARGING_FULL "\xEE\x86\xA5"
+#endif
+#ifndef MATERIAL_SYMBOLS_BATTERY_FULL
+#define MATERIAL_SYMBOLS_BATTERY_FULL "\xEE\x86\xA4"
+#endif
+#ifndef MATERIAL_SYMBOLS_BATTERY_6_BAR
+#define MATERIAL_SYMBOLS_BATTERY_6_BAR "\xEE\x86\xA4"
+#endif
+#ifndef MATERIAL_SYMBOLS_BATTERY_5_BAR
+#define MATERIAL_SYMBOLS_BATTERY_5_BAR "\xEE\x86\xA4"
+#endif
 #ifndef MATERIAL_SYMBOLS_BATTERY_4_BAR
 #define MATERIAL_SYMBOLS_BATTERY_4_BAR "\xEE\x86\xA4"
 #endif
@@ -33,6 +46,9 @@
 #endif
 #ifndef MATERIAL_SYMBOLS_BATTERY_1_BAR
 #define MATERIAL_SYMBOLS_BATTERY_1_BAR "\xEE\x86\xA1"
+#endif
+#ifndef MATERIAL_SYMBOLS_BATTERY_0_BAR
+#define MATERIAL_SYMBOLS_BATTERY_0_BAR "\xEE\x86\xA0"
 #endif
 
 class LvglImage;
@@ -91,8 +107,14 @@ public:
         return true;
     }
 
+    // SetTheme overloads
     virtual bool SetTheme(const char* theme) override { return true; }
     virtual bool SetTheme(std::shared_ptr<const Theme> theme) override { return true; }
+    void SetTheme(const std::string& theme_name);
+    void SetTheme(std::shared_ptr<Theme> theme);
+    void SetTheme(LvglTheme* theme) { (void)theme; }
+    void SetTheme(const LvglTheme& theme) { (void)theme; }
+
     virtual bool SetImage(const uint8_t* data, size_t size) override { (void)data; (void)size; return true; }
     virtual bool SnapshotToJpeg(std::string path, int quality) override { (void)path; (void)quality; return true; }
 
@@ -102,8 +124,6 @@ public:
     virtual bool SupportsDynamicGlyph() { return true; }
 
     std::shared_ptr<LvglThemeManager> theme_manager() const { return theme_manager_; }
-    void SetTheme(const std::string& theme_name);
-    void SetTheme(std::shared_ptr<Theme> theme);
 
     virtual bool Lock(int timeout_ms) override;
     virtual void Unlock() override;
