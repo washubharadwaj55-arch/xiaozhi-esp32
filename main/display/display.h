@@ -1,89 +1,35 @@
-#ifndef LVGL_DISPLAY_H
-#define LVGL_DISPLAY_H
-
-#include "display.h"
+#ifndef _DISPLAY_H_
+#define _DISPLAY_H_
 
 #include <string>
-#include <chrono>
 #include <memory>
-#include <functional>
+#include <esp_image_format.h>
 
-#include <esp_log.h>
-#include <esp_err.h>
-#include <esp_timer.h>
+class Theme;
 
-#include <lvgl.h>
-
-#include "dynamic_glyph_cache.h"
-#include "lvgl_font.h"
-#include "lvgl_theme.h"
-
-class LvglImage;
-class LvglThemeManager;
-
-class LvglDisplay : public Display {
+class Display {
 public:
-    LvglDisplay();
-    ~LvglDisplay();
+    virtual ~Display() = default;
 
-    virtual bool SetStatus(const char* status) override;
-    virtual bool ShowNotification(const char* notification, int duration_ms = 3000) override;
-    virtual bool ShowNotification(const std::string& notification, int duration_ms = 3000) override;
-    virtual bool SetPreviewImage(const esp_image_t* image) override;
-    virtual bool SetPreviewImage(const uint8_t* data, size_t size) override;
-    virtual bool SetStatusMode(bool mode) override;
-    virtual bool SnapshotToJpeg(std::string jpeg_data, int quality = 80) override;
-    virtual bool SetChatMessage(const char* role, const char* content) override;
-    virtual bool ClearChatMessage() override;
-    virtual bool SetEmotion(const char* emotion) override;
-    virtual bool SetTheme(const char* theme) override;
-    virtual bool SetTheme(std::shared_ptr<const Theme> theme) override;
-    virtual bool SupportsDynamicGlyph() override { return true; }
-
-    virtual void SetPowerSaveMode(bool on) override;
-
-    void SetThemeManager(std::shared_ptr<LvglThemeManager> theme_manager);
-    void SetTheme(LvglTheme* theme);
-    void Tick(uint32_t period = 0);
-
-    void SetOnChatMessage(std::function<void(const char*, const char*)> callback);
-    void SetOnEmotionSet(std::function<void(const char*)> callback);
-
-    void SetChatMessage(std::function<void(const char*, const char*)> callback);
-    void SetEmotionMessage(std::function<void(const char*)> callback);
+    virtual bool SetStatus(const char* status) = 0;
+    virtual bool ShowNotification(const char* notification, int duration_ms = 3000) = 0;
+    virtual bool ShowNotification(const std::string& notification, int duration_ms = 3000) = 0;
+    virtual bool SetPreviewImage(const esp_image_t* image) = 0;
+    virtual bool SetPreviewImage(const uint8_t* data, size_t size) = 0;
+    virtual bool SetStatusMode(bool mode) = 0;
+    virtual bool SnapshotToJpeg(std::string& jpeg_data, int quality = 80) = 0;
+    virtual bool SetChatMessage(const char* role, const char* content) = 0;
+    virtual bool ClearChatMessage() = 0;
+    virtual bool SetEmotion(const char* emotion) = 0;
+    virtual bool SetTheme(const char* theme) = 0;
+    virtual bool SetTheme(std::shared_ptr<const Theme> theme) = 0;
+    virtual bool SupportsDynamicGlyph() { return false; }
+    virtual void SetPowerSaveMode(bool on) = 0;
+    virtual void UpdateStatusbar(bool update_all = false);
 
 protected:
-    esp_pm_lock_handle_t pm_lock_ = nullptr;
-    lv_display_t* lv_display_ = nullptr;
-
-    lv_obj_t* network_label_ = nullptr;
-    lv_obj_t* status_label_ = nullptr;
-    lv_obj_t* notification_label_ = nullptr;
-    lv_obj_t* mute_label_ = nullptr;
-    lv_obj_t* chat_message_label_ = nullptr;
-    lv_obj_t* emotion_label_ = nullptr;
-    lv_obj_t* battery_label_ = nullptr;
-    lv_obj_t* low_battery_popup_ = nullptr;
-
-    char* battery_icon_ = nullptr;
-    lv_timer_t* low_battery_timer_ = nullptr;
-    bool muted_ = false;
-
-    std::shared_ptr<LvglThemeManager> theme_manager_;
-    std::shared_ptr<LvglTheme> light_theme_;
-    std::shared_ptr<LvglTheme> dark_theme_;
-
-    std::function<void(const char*, const char*)> on_chat_message_;
-    std::function<void(const char*)> on_emotion_set_;
-
-    std::chrono::system_clock::time_point last_status_update_time_;
-    esp_timer_handle_t notification_timer_ = nullptr;
-    int last_displayed_clock_min_ = -1;
-    std::unique_ptr<DynamicGlyphCache> dynamic_glyph_cache_;
-
-    friend class DisplayNetwork;
-    virtual void Lock();
-    virtual void Unlock();
+    virtual bool Lock(int timeout_ms = 0) = 0;
+    virtual void Unlock() = 0;
 };
 
-#endif // LVGL_DISPLAY_H
+#endif // _DISPLAY_H_
