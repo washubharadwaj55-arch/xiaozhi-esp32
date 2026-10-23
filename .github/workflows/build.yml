@@ -15,11 +15,16 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
       - name: Build
         shell: bash
         run: |
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
           source $IDF_PATH/export.sh
-          python scripts/release.py prepare --idf-version 5.5 --source-sha HEAD --output-dir build
+          python scripts/release.py bread-compact-esp32 --name bread-compact-esp32
+
       - name: Upload firmware
         uses: actions/upload-artifact@v4
         with:
