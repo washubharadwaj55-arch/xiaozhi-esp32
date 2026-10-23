@@ -11,7 +11,7 @@ jobs:
     name: Build bread-compact-esp32
     runs-on: ubuntu-latest
     container:
-      image: espressif/idf:release-v5.5
+      image: espressif/idf:release-v6.1
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -24,7 +24,7 @@ jobs:
           git config --global --add safe.directory "$GITHUB_WORKSPACE"
           source $IDF_PATH/export.sh
           FULL_SHA=$(git rev-parse HEAD)
-          python scripts/release.py prepare --idf-version 5.5 --source-sha "$FULL_SHA" --output-dir build
+          python scripts/release.py prepare --idf-version 6.1 --source-sha "$FULL_SHA" --output-dir build
 
       - name: Upload firmware
         uses: actions/upload-artifact@v4
