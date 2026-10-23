@@ -23,7 +23,8 @@ jobs:
         run: |
           git config --global --add safe.directory "$GITHUB_WORKSPACE"
           source $IDF_PATH/export.sh
-          python scripts/release.py bread-compact-esp32 --name bread-compact-esp32
+          FULL_SHA=$(git rev-parse HEAD)
+          python scripts/release.py prepare --idf-version 5.5 --source-sha "$FULL_SHA" --output-dir build
 
       - name: Upload firmware
         uses: actions/upload-artifact@v4
