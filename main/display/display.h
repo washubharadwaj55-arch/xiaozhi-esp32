@@ -8,8 +8,8 @@
 #include <vector>
 
 class LvglFont;
+class LvglTheme;
 
-// Base Theme interface expected by LvglTheme and LcdDisplay
 class Theme {
 public:
     virtual ~Theme() = default;
@@ -27,14 +27,24 @@ public:
     }
     virtual bool SetEmotion(const char* emotion) = 0;
     virtual bool SetIcon(const char* icon) = 0;
-    virtual bool SetChatMessage(const char* role, const char* content) = 0;
-    virtual bool ClearChatMessages() = 0;
-    virtual bool SetTheme(const char* theme) = 0;
-    virtual bool SetTheme(std::shared_ptr<const Theme> theme) = 0;
-    virtual bool SetImage(const uint8_t* data, size_t size) = 0;
-    virtual bool SnapshotToJpeg(std::string path, int quality) = 0;
-    virtual bool SupportsEmoji(int code) { return false; }
-    virtual void UpdateStatusbar(bool update_all = false) = 0;
+
+    // Both bool and void signatures to satisfy LcdDisplay and LvglDisplay
+    virtual void SetChatMessage(const char* role, const char* content) {}
+    virtual void RemoveChatMessage(const char* role, const char* content) { (void)role; (void)content; }
+    virtual void ClearChatMessages() {}
+    virtual void SetHideSubtitle(bool hide) { (void)hide; }
+
+    virtual bool SetTheme(const char* theme) { (void)theme; return true; }
+    virtual bool SetTheme(std::shared_ptr<const Theme> theme) { (void)theme; return true; }
+    virtual void SetTheme(LvglTheme* theme) { (void)theme; }
+    virtual void SetTheme(Theme* theme) { (void)theme; }
+
+    virtual bool SetImage(const uint8_t* data, size_t size) { (void)data; (void)size; return true; }
+    virtual bool SnapshotToJpeg(std::string path, int quality) { (void)path; (void)quality; return true; }
+    virtual bool SupportsEmoji(int code) { (void)code; return false; }
+    virtual void UpdateStatusbar(bool update_all = false) { (void)update_all; }
+
+    virtual void SetupUI() {}
 
     virtual bool Lock(int timeout_ms = 0) = 0;
     virtual void Unlock() = 0;
