@@ -8,7 +8,7 @@ permissions:
   contents: read
 jobs:
   build:
-    name: Build bread-compact-esp32
+    name: Build esp32
     runs-on: ubuntu-latest
     container:
       image: espressif/idf:release-v6.1
@@ -23,7 +23,7 @@ jobs:
         run: |
           git config --global --add safe.directory "$GITHUB_WORKSPACE"
           source $IDF_PATH/export.sh
-          idf.py -D SDKCONFIG_DEFAULTS="sdkconfig.defaults;sdkconfig.defaults.bread-compact-esp32" set-target esp32
+          idf.py -D SDKCONFIG_DEFAULTS="sdkconfig.defaults;sdkconfig.defaults.esp32" set-target esp32
           idf.py build
           idf.py merge-bin
 
