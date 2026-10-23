@@ -1,4 +1,3 @@
-
 #ifndef _LVGL_DISPLAY_H
 #define _LVGL_DISPLAY_H
 
@@ -9,6 +8,7 @@
 #include <esp_timer.h>
 #include <esp_lcd_panel_io.h>
 #include <esp_lcd_panel_ops.h>
+#include <esp_pm.h>
 
 #include <string>
 #include <functional>
@@ -22,7 +22,6 @@
 #include "lvgl_font.h"
 #include "lvgl_theme.h"
 
-// All fallback battery and charging symbols
 #ifndef MATERIAL_SYMBOLS_BATTERY_CHARGING_FULL
 #define MATERIAL_SYMBOLS_BATTERY_CHARGING_FULL "\xEE\x86\xA5"
 #endif
@@ -54,7 +53,6 @@
 class LvglImage;
 class LvglThemeManager;
 
-// DisplayLockGuard helper
 class DisplayLockGuard {
 public:
     DisplayLockGuard(Display* display) : display_(display) {
@@ -72,48 +70,26 @@ public:
     LvglDisplay();
     virtual ~LvglDisplay();
 
-    virtual void ShowNotification(const std::string& notification, int duration_ms = 3000);
-    virtual void ShowNotification(const char* notification, int duration_ms = 3000);
-    virtual bool ShowNotification(const char* notification, int duration_ms) override {
-        ShowNotification(notification, duration_ms);
-        return true;
-    }
+    virtual bool ShowNotification(const char* notification, int duration_ms = 3000) override;
+    virtual bool ShowNotification(const std::string& notification, int duration_ms = 3000) override;
 
+    virtual bool SetStatus(const char* status) override;
     virtual void SetStatus(const std::string& status);
-    virtual void SetStatus(const char* status);
-    virtual bool SetStatus(const char* status) override {
-        SetStatus(status);
-        return true;
-    }
 
+    virtual bool SetEmotion(const char* emotion) override;
     virtual void SetEmotion(const std::string& emotion);
-    virtual void SetEmotion(const char* emotion);
-    virtual bool SetEmotion(const char* emotion) override {
-        SetEmotion(emotion);
-        return true;
-    }
 
     virtual bool SetIcon(const char* icon) override { (void)icon; return true; }
 
-    virtual void SetChatMessage(const char* role, const char* content);
-    virtual bool SetChatMessage(const char* role, const char* content) override {
-        SetChatMessage(role, content);
-        return true;
-    }
-
+    virtual bool SetChatMessage(const char* role, const char* content) override;
+    virtual bool ClearChatMessages() override;
     virtual void ClearChatMessage();
-    virtual bool ClearChatMessages() override {
-        ClearChatMessage();
-        return true;
-    }
 
-    // SetTheme overloads
-    virtual bool SetTheme(const char* theme) override { return true; }
-    virtual bool SetTheme(std::shared_ptr<const Theme> theme) override { return true; }
+    virtual bool SetTheme(const char* theme) override;
+    virtual bool SetTheme(std::shared_ptr<const Theme> theme) override;
     void SetTheme(const std::string& theme_name);
     void SetTheme(std::shared_ptr<Theme> theme);
-    void SetTheme(LvglTheme* theme) { (void)theme; }
-    void SetTheme(const LvglTheme& theme) { (void)theme; }
+    void SetTheme(LvglTheme* theme);
 
     virtual bool SetImage(const uint8_t* data, size_t size) override { (void)data; (void)size; return true; }
     virtual bool SnapshotToJpeg(std::string path, int quality) override { (void)path; (void)quality; return true; }
@@ -153,6 +129,7 @@ protected:
     lv_obj_t* notification_label_ = nullptr;
 
     esp_timer_handle_t notification_timer_ = nullptr;
+    esp_pm_lock_handle_t pm_lock_ = nullptr;
 
     bool muted_ = false;
     int battery_icon_ = 0;
@@ -165,7 +142,7 @@ protected:
     esp_timer_handle_t status_bar_timer_ = nullptr;
     bool show_status_bar_ = false;
 
-    std::unique_ptr<DynamicGlyphCache> glyph_cache_;
+    std::unique_ptr<DynamicGlyphCache> dynamic_glyph_cache_;
 
     friend class DisplayNetwork;
     virtual void SetupUI();
