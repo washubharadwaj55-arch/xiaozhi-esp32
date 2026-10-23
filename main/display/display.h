@@ -5,8 +5,13 @@
 #include <memory>
 #include <cstdint>
 #include <cstddef>
+#include <vector>
 
-class Theme;
+// Full Theme definition so derived classes can inherit without forward declaration issues
+class Theme {
+public:
+    virtual ~Theme() = default;
+};
 
 class Display {
 public:
@@ -28,7 +33,7 @@ public:
     virtual bool SupportsEmoji(int code) { return false; }
     virtual void UpdateStatusbar(bool update_all = false) = 0;
 
-protected:
+    // Must be public so DisplayLockGuard can access them
     virtual bool Lock(int timeout_ms = 0) = 0;
     virtual void Unlock() = 0;
 };
