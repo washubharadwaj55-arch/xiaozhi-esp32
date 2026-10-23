@@ -21,6 +21,20 @@
 #include "lvgl_font.h"
 #include "lvgl_theme.h"
 
+// Fallback battery symbols if not defined by icon font
+#ifndef MATERIAL_SYMBOLS_BATTERY_4_BAR
+#define MATERIAL_SYMBOLS_BATTERY_4_BAR "\xEE\x86\xA4"
+#endif
+#ifndef MATERIAL_SYMBOLS_BATTERY_3_BAR
+#define MATERIAL_SYMBOLS_BATTERY_3_BAR "\xEE\x86\xA3"
+#endif
+#ifndef MATERIAL_SYMBOLS_BATTERY_2_BAR
+#define MATERIAL_SYMBOLS_BATTERY_2_BAR "\xEE\x86\xA2"
+#endif
+#ifndef MATERIAL_SYMBOLS_BATTERY_1_BAR
+#define MATERIAL_SYMBOLS_BATTERY_1_BAR "\xEE\x86\xA1"
+#endif
+
 class LvglImage;
 class LvglThemeManager;
 
@@ -42,7 +56,6 @@ public:
     LvglDisplay();
     virtual ~LvglDisplay();
 
-    // Matching exactly with lvgl_display.cc
     virtual void ShowNotification(const std::string& notification, int duration_ms = 3000);
     virtual void ShowNotification(const char* notification, int duration_ms = 3000);
     virtual bool ShowNotification(const char* notification, int duration_ms) override {
@@ -92,7 +105,7 @@ public:
     void SetTheme(const std::string& theme_name);
     void SetTheme(std::shared_ptr<Theme> theme);
 
-    virtual bool Lock(int timeout_ms = 0) override;
+    virtual bool Lock(int timeout_ms) override;
     virtual void Unlock() override;
 
     void SetDirectionGetMethod(const char* method, std::function<void(const char*)> callback);
@@ -117,6 +130,9 @@ protected:
     lv_obj_t* chat_message_label_ = nullptr;
     lv_obj_t* battery_label_ = nullptr;
     lv_obj_t* battery_progress_ = nullptr;
+    lv_obj_t* notification_label_ = nullptr;
+
+    esp_timer_handle_t notification_timer_ = nullptr;
 
     bool muted_ = false;
     int battery_icon_ = 0;
