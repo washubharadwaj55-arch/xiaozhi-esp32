@@ -46,6 +46,9 @@ public:
 
     virtual void SetupUI() {}
 
+    virtual bool IsMonochrome() const { return false; }
+    virtual void SetPowerSaveMode(bool on) { (void)on; }
+
     virtual bool Lock(int timeout_ms = 0) = 0;
     virtual void Unlock() = 0;
 };
