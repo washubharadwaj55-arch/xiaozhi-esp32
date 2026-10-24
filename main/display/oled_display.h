@@ -18,7 +18,7 @@ public:
     virtual void SetupUI() override;
     virtual bool SetEmotion(const char* emotion) override;
     virtual void SetTheme(Theme* theme) override;
-    virtual void SetPowerSaveMode(bool on) override;
+    virtual void SetPowerSaveMode(bool on) override { (void)on; }
 
 private:
     void SetupUI_128x64();
