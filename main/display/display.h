@@ -16,6 +16,7 @@ public:
     Theme(const std::string& name) : name_(name) {}
     virtual ~Theme() = default;
 
+    virtual const std::string& name() const { return name_; }
     virtual const std::string& GetName() const { return name_; }
     virtual std::shared_ptr<LvglFont> GetTextFont() const { return nullptr; }
 
