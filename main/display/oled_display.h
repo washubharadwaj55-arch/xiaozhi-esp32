@@ -11,7 +11,7 @@ public:
                 int width, int height, bool mirror_x, bool mirror_y);
     virtual ~OledDisplay() override;
 
-    virtual bool Lock() override { return LvglDisplay::Lock(); }
+    virtual bool Lock() override { return LvglDisplay::Lock(0); }
     virtual bool Lock(int timeout_ms) override { return LvglDisplay::Lock(timeout_ms); }
     virtual void Unlock() override { LvglDisplay::Unlock(); }
 
