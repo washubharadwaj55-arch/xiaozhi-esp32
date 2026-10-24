@@ -1,6 +1,5 @@
 #include "oled_display.h"
 #include "assets/lang_config.h"
-#include "font_awesome.h"
 #include "lvgl_theme.h"
 #include "settings.h"
 
@@ -306,11 +305,6 @@ bool OledDisplay::SetEmotion(const char* emotion) {
         utf8 = noto_emoji_get_utf8(emotion);
         if (utf8 != nullptr) {
             font = emoji_font.get();
-        } else {
-            utf8 = font_awesome_get_utf8(emotion);
-            if (utf8 != nullptr) {
-                font = icon_font.get();
-            }
         }
     }
 
