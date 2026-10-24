@@ -27,6 +27,9 @@ class Display {
 public:
     virtual ~Display() = default;
 
+    virtual int width() const { return width_; }
+    virtual int height() const { return height_; }
+
     virtual bool SetStatus(const char* status) = 0;
     virtual bool ShowNotification(const char* notification, int duration_ms = 3000) = 0;
     virtual bool ShowNotification(const std::string& notification, int duration_ms = 3000) {
@@ -44,6 +47,7 @@ public:
     virtual bool SetTheme(std::shared_ptr<const Theme> theme) { (void)theme; return true; }
     virtual void SetTheme(LvglTheme* theme) { (void)theme; }
     virtual void SetTheme(Theme* theme) { (void)theme; }
+    virtual Theme* GetTheme() const { return nullptr; }
 
     virtual bool SetImage(const uint8_t* data, size_t size) { (void)data; (void)size; return true; }
     virtual bool SnapshotToJpeg(std::string path, int quality) { (void)path; (void)quality; return true; }
@@ -57,6 +61,10 @@ public:
 
     virtual bool Lock(int timeout_ms = 0) = 0;
     virtual void Unlock() = 0;
+
+protected:
+    int width_ = 0;
+    int height_ = 0;
 };
 
 #endif // _DISPLAY_H_
