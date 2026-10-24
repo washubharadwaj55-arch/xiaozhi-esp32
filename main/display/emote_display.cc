@@ -1,12 +1,13 @@
 #include "emote_display.h"
 #include <esp_log.h>
 
-#define TAG "EmoteDisplay"
+static const char* TAG = "EmoteDisplay";
 
-namespace emote {
+EmoteDisplay::EmoteDisplay() {
+    ESP_LOGI(TAG, "EmoteDisplay initialized");
+}
 
-// Methods implementation for EmoteDisplay
-bool EmoteDisplay::Lock(const int timeout_ms) {
+bool EmoteDisplay::Lock(int timeout_ms) {
     (void)timeout_ms;
     return true;
 }
@@ -26,5 +27,3 @@ bool EmoteDisplay::InsertAnimDialog(const char* emoji_name, uint32_t duration_ms
 
 void EmoteDisplay::RefreshAll() {
 }
-
-} // namespace emote
