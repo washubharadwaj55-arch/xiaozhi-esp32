@@ -12,8 +12,15 @@ class LvglTheme;
 
 class Theme {
 public:
+    Theme() = default;
+    Theme(const std::string& name) : name_(name) {}
     virtual ~Theme() = default;
+
+    virtual const std::string& GetName() const { return name_; }
     virtual std::shared_ptr<LvglFont> GetTextFont() const { return nullptr; }
+
+protected:
+    std::string name_;
 };
 
 class Display {
@@ -28,8 +35,7 @@ public:
     virtual bool SetEmotion(const char* emotion) = 0;
     virtual bool SetIcon(const char* icon) = 0;
 
-    // Both bool and void signatures to satisfy LcdDisplay and LvglDisplay
-    virtual void SetChatMessage(const char* role, const char* content) {}
+    virtual void SetChatMessage(const char* role, const char* content) { (void)role; (void)content; }
     virtual void RemoveChatMessage(const char* role, const char* content) { (void)role; (void)content; }
     virtual void ClearChatMessages() {}
     virtual void SetHideSubtitle(bool hide) { (void)hide; }
