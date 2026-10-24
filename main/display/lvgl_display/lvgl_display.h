@@ -82,16 +82,16 @@ public:
 
     virtual bool SetIcon(const char* icon) override { (void)icon; return true; }
 
-    virtual bool SetChatMessage(const char* role, const char* content) override;
-    virtual bool ClearChatMessages() override;
+    virtual void SetChatMessage(const char* role, const char* content) override;
     virtual void ClearChatMessage();
+    virtual void ClearChatMessages() override;
 
     virtual bool SetTheme(const char* theme) override;
     virtual bool SetTheme(std::shared_ptr<const Theme> theme) override;
-    virtual void SetTheme(Theme* theme) { (void)theme; }
+    virtual void SetTheme(Theme* theme) override { (void)theme; }
+    virtual void SetTheme(LvglTheme* theme) override;
     void SetTheme(const std::string& theme_name);
     void SetTheme(std::shared_ptr<Theme> theme);
-    void SetTheme(LvglTheme* theme);
 
     virtual bool SetImage(const uint8_t* data, size_t size) override { (void)data; (void)size; return true; }
     virtual bool SnapshotToJpeg(std::string path, int quality) override { (void)path; (void)quality; return true; }
@@ -111,6 +111,7 @@ public:
     void SetEmotionSelectedMethod(std::function<void(const char*)> callback);
 
     virtual void UpdateStatusbar(bool update_all = false) override;
+    virtual void SetupUI() override;
 
 protected:
     virtual bool Lock() = 0;
@@ -157,7 +158,6 @@ protected:
     std::unique_ptr<DynamicGlyphCache> dynamic_glyph_cache_;
 
     friend class DisplayNetwork;
-    virtual void SetupUI();
     virtual void Tick();
 };
 
