@@ -17,8 +17,7 @@ public:
     virtual bool SetEmotion(const char* emotion) override { (void)emotion; return true; }
     virtual bool SetIcon(const char* icon) override { (void)icon; return true; }
 
-    bool Lock(const int timeout_ms = 0);
-    virtual bool Lock(int timeout_ms = 0) override { return Lock((const int)timeout_ms); }
+    virtual bool Lock(int timeout_ms = 0) override;
     virtual void Unlock() override;
 
     bool StopAnimDialog();
@@ -27,4 +26,3 @@ public:
 };
 
 #endif // _EMOTE_DISPLAY_H_
-
