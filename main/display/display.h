@@ -9,16 +9,7 @@
 
 class LvglFont;
 class LvglTheme;
-
-struct TextGlyph {
-    uint32_t codepoint = 0;
-    uint16_t box_w = 0;
-    uint16_t box_h = 0;
-    int16_t ofs_x = 0;
-    int16_t ofs_y = 0;
-    uint16_t adv_w = 0;
-    std::vector<uint8_t> bitmap;
-};
+struct TextGlyph;
 
 class Theme {
 public:
