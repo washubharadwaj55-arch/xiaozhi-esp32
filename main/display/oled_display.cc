@@ -22,7 +22,6 @@ LV_FONT_DECLARE(BUILTIN_ICON_FONT);
 LV_FONT_DECLARE(font_material_symbols_30_1);
 LV_FONT_DECLARE(font_noto_emoji_30_1);
 
-// Concrete wrapper to satisfy abstract LvglFont interface
 class ConcreteLvglFont : public LvglFont {
 public:
     explicit ConcreteLvglFont(const lv_font_t* font) : font_(font) {}
@@ -50,7 +49,7 @@ OledDisplay::OledDisplay(esp_lcd_panel_io_handle_t io_handle, esp_lcd_panel_hand
 
     auto& theme_manager = LvglThemeManager::GetInstance();
     theme_manager.AddTheme("dark", dark_theme);
-    current_theme_ = dark_theme;
+    current_theme_ = dark_theme.get();
 
     ESP_LOGI(TAG, "Initialize LVGL");
     lvgl_port_cfg_t lvgl_port_cfg = ESP_LVGL_PORT_INIT_CONFIG();
@@ -133,17 +132,18 @@ void OledDisplay::SetupUI() {
 
 void OledDisplay::SetupUI_128x64() {
     DisplayLockGuard lock(this);
-    if (!lock || current_theme_ == nullptr) {
+    if (current_theme_ == nullptr) {
         return;
     }
 
     auto text_font = current_theme_->GetTextFont();
     auto icon_font = current_theme_->GetIconFont();
-    auto large_icon_font = current_theme_->GetLargeIconFont();
 
     lv_obj_t* screen = lv_screen_active();
     lv_obj_clean(screen);
-    lv_obj_set_style_text_font(screen, text_font->font(), 0);
+    if (text_font) {
+        lv_obj_set_style_text_font(screen, text_font->font(), 0);
+    }
 
     container_ = lv_obj_create(screen);
     lv_obj_set_size(container_, width_, height_);
@@ -160,7 +160,6 @@ void OledDisplay::SetupUI_128x64() {
     lv_obj_set_flex_align(content_, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
 
     emotion_label_ = lv_label_create(content_);
-    lv_obj_set_style_text_font(emotion_label_, large_icon_font->font(), 0);
     lv_label_set_text(emotion_label_, MATERIAL_SYMBOLS_ROBOT_2);
     lv_obj_set_style_text_align(emotion_label_, LV_TEXT_ALIGN_CENTER, 0);
     lv_obj_set_style_pad_top(emotion_label_, 10, 0);
@@ -168,7 +167,9 @@ void OledDisplay::SetupUI_128x64() {
 
     chat_message_label_ = lv_label_create(content_);
     lv_obj_set_size(chat_message_label_, width_ - 32, LV_SIZE_CONTENT);
-    lv_obj_set_style_text_font(chat_message_label_, text_font->font(), 0);
+    if (text_font) {
+        lv_obj_set_style_text_font(chat_message_label_, text_font->font(), 0);
+    }
     lv_obj_set_style_pad_top(chat_message_label_, 14, 0);
     lv_obj_set_style_text_align(chat_message_label_, LV_TEXT_ALIGN_CENTER, 0);
     lv_label_set_long_mode(chat_message_label_, LV_LABEL_LONG_WRAP);
@@ -181,41 +182,52 @@ void OledDisplay::SetupUI_128x64() {
     lv_obj_set_flex_align(status_bar_, LV_FLEX_ALIGN_SPACE_BETWEEN, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
 
     network_label_ = lv_label_create(status_bar_);
-    lv_obj_set_style_text_font(network_label_, icon_font->font(), 0);
+    if (icon_font) {
+        lv_obj_set_style_text_font(network_label_, icon_font->font(), 0);
+    }
     lv_label_set_text(network_label_, "");
 
     status_label_ = lv_label_create(status_bar_);
     lv_obj_set_style_text_align(status_label_, LV_TEXT_ALIGN_CENTER, 0);    
-    lv_obj_set_style_text_font(status_label_, text_font->font(), 0);
+    if (text_font) {
+        lv_obj_set_style_text_font(status_label_, text_font->font(), 0);
+    }
     lv_label_set_text(status_label_, "Washu Bhardwaj");
 
     notification_label_ = lv_label_create(status_bar_);
-    lv_obj_set_style_text_font(notification_label_, text_font->font(), 0);
+    if (text_font) {
+        lv_obj_set_style_text_font(notification_label_, text_font->font(), 0);
+    }
     lv_label_set_text(notification_label_, "");
     lv_obj_add_flag(notification_label_, LV_OBJ_FLAG_HIDDEN);
 
     mute_label_ = lv_label_create(status_bar_);
-    lv_obj_set_style_text_font(mute_label_, icon_font->font(), 0);
+    if (icon_font) {
+        lv_obj_set_style_text_font(mute_label_, icon_font->font(), 0);
+    }
     lv_label_set_text(mute_label_, "");
 
     battery_label_ = lv_label_create(status_bar_);
-    lv_obj_set_style_text_font(battery_label_, icon_font->font(), 0);
+    if (icon_font) {
+        lv_obj_set_style_text_font(battery_label_, icon_font->font(), 0);
+    }
     lv_label_set_text(battery_label_, "");
 }
 
 void OledDisplay::SetupUI_128x32() {
     DisplayLockGuard lock(this);
-    if (!lock || current_theme_ == nullptr) {
+    if (current_theme_ == nullptr) {
         return;
     }
 
     auto text_font = current_theme_->GetTextFont();
     auto icon_font = current_theme_->GetIconFont();
-    auto large_icon_font = current_theme_->GetLargeIconFont();
 
     lv_obj_t* screen = lv_screen_active();
     lv_obj_clean(screen);
-    lv_obj_set_style_text_font(screen, text_font->font(), 0);
+    if (text_font) {
+        lv_obj_set_style_text_font(screen, text_font->font(), 0);
+    }
 
     container_ = lv_obj_create(screen);
     lv_obj_set_size(container_, width_, height_);
@@ -234,13 +246,14 @@ void OledDisplay::SetupUI_128x32() {
     lv_obj_set_flex_align(content_, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
 
     emotion_label_ = lv_label_create(content_);
-    lv_obj_set_style_text_font(emotion_label_, large_icon_font->font(), 0);
     lv_label_set_text(emotion_label_, MATERIAL_SYMBOLS_ROBOT_2);
     lv_obj_add_flag(emotion_label_, LV_OBJ_FLAG_HIDDEN);
 
     chat_message_label_ = lv_label_create(content_);
     lv_obj_set_size(chat_message_label_, width_ - 48, LV_SIZE_CONTENT);
-    lv_obj_set_style_text_font(chat_message_label_, text_font->font(), 0);
+    if (text_font) {
+        lv_obj_set_style_text_font(chat_message_label_, text_font->font(), 0);
+    }
     lv_obj_set_style_pad_left(chat_message_label_, 10, 0);
     lv_label_set_long_mode(chat_message_label_, LV_LABEL_LONG_WRAP);
     lv_label_set_text(chat_message_label_, "");
@@ -252,25 +265,35 @@ void OledDisplay::SetupUI_128x32() {
     lv_obj_set_flex_align(side_bar_, LV_FLEX_ALIGN_SPACE_BETWEEN, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
 
     network_label_ = lv_label_create(side_bar_);
-    lv_obj_set_style_text_font(network_label_, icon_font->font(), 0);
+    if (icon_font) {
+        lv_obj_set_style_text_font(network_label_, icon_font->font(), 0);
+    }
     lv_label_set_text(network_label_, "");
 
     status_label_ = lv_label_create(side_bar_);
-    lv_obj_set_style_text_font(status_label_, text_font->font(), 0);
+    if (text_font) {
+        lv_obj_set_style_text_font(status_label_, text_font->font(), 0);
+    }
     lv_label_set_text(status_label_, "Washu Bhardwaj");
     lv_obj_add_flag(status_label_, LV_OBJ_FLAG_HIDDEN);
 
     notification_label_ = lv_label_create(side_bar_);
-    lv_obj_set_style_text_font(notification_label_, text_font->font(), 0);
+    if (text_font) {
+        lv_obj_set_style_text_font(notification_label_, text_font->font(), 0);
+    }
     lv_label_set_text(notification_label_, "");
     lv_obj_add_flag(notification_label_, LV_OBJ_FLAG_HIDDEN);
 
     mute_label_ = lv_label_create(side_bar_);
-    lv_obj_set_style_text_font(mute_label_, icon_font->font(), 0);
+    if (icon_font) {
+        lv_obj_set_style_text_font(mute_label_, icon_font->font(), 0);
+    }
     lv_label_set_text(mute_label_, "");
 
     battery_label_ = lv_label_create(side_bar_);
-    lv_obj_set_style_text_font(battery_label_, icon_font->font(), 0);
+    if (icon_font) {
+        lv_obj_set_style_text_font(battery_label_, icon_font->font(), 0);
+    }
     lv_label_set_text(battery_label_, "");
 }
 
@@ -287,70 +310,52 @@ bool OledDisplay::SetEmotion(const char* emotion) {
     auto& theme_manager = LvglThemeManager::GetInstance();
     auto light_theme = theme_manager.GetTheme("light");
     auto dark_theme = theme_manager.GetTheme("dark");
-    std::shared_ptr<LvglTheme> current_theme;
+    LvglTheme* active_theme = nullptr;
     if (light_theme && lv_obj_get_screen(emotion_label_) == lv_obj_get_screen(light_theme->GetScreen())) {
-        current_theme = light_theme;
+        active_theme = light_theme.get();
     } else if (dark_theme && lv_obj_get_screen(emotion_label_) == lv_obj_get_screen(dark_theme->GetScreen())) {
-        current_theme = dark_theme;
+        active_theme = dark_theme.get();
     } else {
-        current_theme = current_theme_;
+        active_theme = current_theme_;
     }
 
     DisplayLockGuard lock(this);
-    if (!lock || current_theme == nullptr) {
+    if (active_theme == nullptr) {
         return false;
     }
-
-    auto emoji_font = current_theme->GetEmojiFont();
 
     if (emotion != nullptr && strcmp(emotion, "none") == 0) {
         lv_obj_add_flag(emotion_label_, LV_OBJ_FLAG_HIDDEN);
         return true;
     }
 
-    const char* utf8 = nullptr;
-    const lv_font_t* font = nullptr;
-    if (emotion != nullptr) {
-        utf8 = noto_emoji_get_utf8(emotion);
-        if (utf8 != nullptr && emoji_font != nullptr) {
-            font = emoji_font->font();
-        }
-    }
-
-    if (utf8 == nullptr) {
-        utf8 = MATERIAL_SYMBOLS_ROBOT_2;
-        if (current_theme->GetLargeIconFont() != nullptr) {
-            font = current_theme->GetLargeIconFont()->font();
-        }
-    }
-
+    const char* utf8 = MATERIAL_SYMBOLS_ROBOT_2;
     lv_label_set_text(emotion_label_, utf8);
-    if (font != nullptr) {
-        lv_obj_set_style_text_font(emotion_label_, font, 0);
-    }
     lv_obj_remove_flag(emotion_label_, LV_OBJ_FLAG_HIDDEN);
 
     return true;
 }
 
-void OledDisplay::SetTheme(LvglTheme* theme) {
-    auto& theme_manager = LvglThemeManager::GetInstance();
-    current_theme_ = theme_manager.GetTheme(theme->GetName());
+void OledDisplay::SetTheme(Theme* theme) {
+    if (!theme) return;
+
+    auto lvgl_theme = dynamic_cast<LvglTheme*>(theme);
+    if (lvgl_theme) {
+        auto& theme_manager = LvglThemeManager::GetInstance();
+        auto th = theme_manager.GetTheme(lvgl_theme->GetName());
+        current_theme_ = th ? th.get() : lvgl_theme;
+    }
 
     DisplayLockGuard lock(this);
-    if (!lock || current_theme_ == nullptr) {
+    if (current_theme_ == nullptr) {
         return;
     }
 
     auto text_font = current_theme_->GetTextFont();
     auto icon_font = current_theme_->GetIconFont();
-    auto large_icon_font = current_theme_->GetLargeIconFont();
 
     if (container_ && text_font) {
         lv_obj_set_style_text_font(container_, text_font->font(), 0);
-    }
-    if (emotion_label_ && large_icon_font) {
-        lv_obj_set_style_text_font(emotion_label_, large_icon_font->font(), LV_STATE_DEFAULT);
     }
     if (chat_message_label_ && text_font) {
         lv_obj_set_style_text_font(chat_message_label_, text_font->font(), 0);
