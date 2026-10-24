@@ -6,7 +6,7 @@
 
 #define TAG "DynamicGlyphCache"
 
-DynamicGlyphCache::DynamicGlyphCache() : retain_between_batches_(TextGlyphStorageUsesPsram()) {}
+DynamicGlyphCache::DynamicGlyphCache() : retain_between_batches_(false) {}
 
 lv_font_t* DynamicGlyphCache::EnsureFont(const lv_font_t* base_font, uint8_t bpp) {
     if (base_font == nullptr || (bpp != 1 && bpp != 4)) {
