@@ -12,10 +12,19 @@ public:
     virtual ~OledDisplay() override;
 
     virtual bool Lock() override { return LvglDisplay::Lock(); }
-    virtual bool Lock(int timeout_ms) override { (void)timeout_ms; return LvglDisplay::Lock(); }
+    virtual bool Lock(int timeout_ms) override { return LvglDisplay::Lock(timeout_ms); }
     virtual void Unlock() override { LvglDisplay::Unlock(); }
 
+    virtual void SetupUI() override;
+    virtual bool SetEmotion(const char* emotion) override;
+    virtual void SetTheme(Theme* theme) override;
     virtual void SetPowerSaveMode(bool on) override;
+
+private:
+    void SetupUI_128x64();
+    void SetupUI_128x32();
+
+    lv_obj_t* side_bar_ = nullptr;
 };
 
 #endif // _OLED_DISPLAY_H_
