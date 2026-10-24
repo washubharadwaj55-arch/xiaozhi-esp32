@@ -63,6 +63,9 @@ public:
     // Asset management methods called by assets.cc
     virtual bool MountAssets(const char* partition_label) { (void)partition_label; return true; }
     virtual void UnmountAssets() {}
+    virtual bool GetAssetData(const std::string& name, const void*& data, size_t& size) {
+        (void)name; (void)data; (void)size; return false;
+    }
     virtual bool GetAssetData(const std::string& name, void*& data, size_t& size) {
         (void)name; (void)data; (void)size; return false;
     }
