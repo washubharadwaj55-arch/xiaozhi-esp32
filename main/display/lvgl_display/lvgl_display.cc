@@ -47,18 +47,16 @@ void LvglDisplay::SetEmotion(const std::string& emotion) {
     SetEmotion(emotion.c_str());
 }
 
-bool LvglDisplay::SetChatMessage(const char* role, const char* content) {
+void LvglDisplay::SetChatMessage(const char* role, const char* content) {
     ESP_LOGI(TAG, "SetChatMessage [%s]: %s", role ? role : "(null)", content ? content : "(null)");
-    return true;
 }
 
 void LvglDisplay::ClearChatMessage() {
     ESP_LOGI(TAG, "ClearChatMessage");
 }
 
-bool LvglDisplay::ClearChatMessages() {
+void LvglDisplay::ClearChatMessages() {
     ClearChatMessage();
-    return true;
 }
 
 void LvglDisplay::SetTheme(const std::string& theme_name) {
