@@ -10,6 +10,16 @@
 class LvglFont;
 class LvglTheme;
 
+struct TextGlyph {
+    uint32_t codepoint = 0;
+    uint16_t box_w = 0;
+    uint16_t box_h = 0;
+    int16_t ofs_x = 0;
+    int16_t ofs_y = 0;
+    uint16_t adv_w = 0;
+    std::vector<uint8_t> bitmap;
+};
+
 class Theme {
 public:
     Theme() = default;
@@ -53,14 +63,19 @@ public:
     virtual bool SetImage(const uint8_t* data, size_t size) { (void)data; (void)size; return true; }
     virtual bool SnapshotToJpeg(std::string path, int quality) { (void)path; (void)quality; return true; }
     virtual bool SupportsEmoji(int code) { (void)code; return false; }
+
     virtual void UpdateStatusbar(bool update_all = false) { (void)update_all; }
+    virtual void UpdateStatusBar(bool update_all = false) { (void)update_all; }
+
+    virtual bool AddTextGlyphs(const std::vector<TextGlyph>& glyphs, uint8_t bpp = 1) {
+        (void)glyphs; (void)bpp; return true;
+    }
 
     virtual void SetupUI() {}
 
     virtual bool IsMonochrome() const { return false; }
     virtual void SetPowerSaveMode(bool on) { (void)on; }
 
-    // Asset management methods called across assets.cc
     virtual bool MountAssets(const char* partition_label) { (void)partition_label; return true; }
     virtual void UnmountAssets() {}
     virtual bool GetAssetData(const std::string& name, const void* data, size_t size) {
