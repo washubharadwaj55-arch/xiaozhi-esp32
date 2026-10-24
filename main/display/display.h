@@ -60,6 +60,14 @@ public:
     virtual bool IsMonochrome() const { return false; }
     virtual void SetPowerSaveMode(bool on) { (void)on; }
 
+    // Asset management methods called by assets.cc
+    virtual bool MountAssets(const char* partition_label) { (void)partition_label; return true; }
+    virtual void UnmountAssets() {}
+    virtual bool GetAssetData(const std::string& name, void*& data, size_t& size) {
+        (void)name; (void)data; (void)size; return false;
+    }
+    virtual bool LoadAssets() { return true; }
+
     virtual bool Lock(int timeout_ms = 0) = 0;
     virtual void Unlock() = 0;
 
