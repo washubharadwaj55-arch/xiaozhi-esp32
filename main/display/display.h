@@ -60,7 +60,7 @@ public:
     virtual bool IsMonochrome() const { return false; }
     virtual void SetPowerSaveMode(bool on) { (void)on; }
 
-    // Asset management methods called by assets.cc
+    // Asset management methods called across assets.cc
     virtual bool MountAssets(const char* partition_label) { (void)partition_label; return true; }
     virtual void UnmountAssets() {}
     virtual bool GetAssetData(const std::string& name, const void* data, size_t size) {
@@ -75,6 +75,12 @@ public:
     virtual bool GetAssetData(const std::string& name, void** data, size_t* size) {
         (void)name; (void)data; (void)size; return false;
     }
+    virtual bool GetAssetData(const std::string& name, void*& data, size_t& size) {
+        (void)name; (void)data; (void)size; return false;
+    }
+    virtual bool GetAssetData(const std::string& name, const void*& data, size_t& size) {
+        (void)name; (void)data; (void)size; return false;
+    }
     virtual bool LoadAssets() { return true; }
 
     virtual bool Lock(int timeout_ms = 0) = 0;
@@ -83,6 +89,19 @@ public:
 protected:
     int width_ = 0;
     int height_ = 0;
+};
+
+class NoDisplay : public Display {
+public:
+    virtual ~NoDisplay() override = default;
+    virtual bool SetStatus(const char* status) override { (void)status; return true; }
+    virtual bool ShowNotification(const char* notification, int duration_ms = 3000) override {
+        (void)notification; (void)duration_ms; return true;
+    }
+    virtual bool SetEmotion(const char* emotion) override { (void)emotion; return true; }
+    virtual bool SetIcon(const char* icon) override { (void)icon; return true; }
+    virtual bool Lock(int timeout_ms = 0) override { (void)timeout_ms; return true; }
+    virtual void Unlock() override {}
 };
 
 #endif // _DISPLAY_H_
